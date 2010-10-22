@@ -1,4 +1,6 @@
-# -*- coding: iso-8859-15 -*-
+# -*- coding: iso-8859-1 -*-
+# (c) 2010 Martin Wendt; see http://nxturtle.googlecode.com/
+# Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
 '''
 Created on 16.10.2010
@@ -23,19 +25,21 @@ from turtle import Turtle, Vec2D
 # Convert radians to degree
 _RTOD = 180.0 / math.pi
  
-# Diameter of a standard wheel in centimeters
+# Diameter of a standard LEGO wheel in centimeters
 _TURTLE_WHEEL_DIAMETER = 4.4
 
-# Axis length in centimeters 
+# Axis length of our Turtle in centimeters 
 # (distance between the two wheels, measured from middle to middle)
+# This value is typically different for your very special Turtle :-)
 _TURTLE_AXIS_LENGTH = 12.5
 
 # Turn angles smaller than this will be ignored
 _EPS_DEGREE = 1.0
+
 # Movement distances smaller than this will be ignored [cm]
 _EPS_UNITS = 1.0
 
-def _default_pen_handler(turtle, down):  #@NoSelf
+def _default_pen_handler(turtle, down): 
     """Default dummy implementation of a pen handler."""
     turtle.debug("turtle._pen_handler(%s): NOT IMPLEMENTED. Call turtle.set_pen_handler()" % down)
     return
@@ -79,18 +83,20 @@ class NXTurtle(Turtle):
     (http://docs.python.org/library/turtle.html)
     """
     DEFAULT_CONFIG = {
-        # Motor turn angle in degree, that will move the turtle by one unit  
-#        "unitToDegree": 360.0 / (_TURTLE_WHEEL_DIAMETER * math.pi),
-        #
+        # Motor turn angle in degree, that will turn the turtle by one degree left  
         "tachoPerDegree": _TURTLE_AXIS_LENGTH / _TURTLE_WHEEL_DIAMETER,
+        # Motor turn angle in degree, that will move the turtle by one unit  
         "tachoPerUnit": 360.0 / (_TURTLE_WHEEL_DIAMETER * math.pi),
-        # 
+        # This power will be applied to the motor for turning 
         "turnPower": 75,
+        # This power will be applied to the motor for moving 
         "drivePower": 75,
         }  
     
     def __init__(self, connect=True):
+
         super(NXTurtle, self).__init__()
+        
         self.brick = None
         self.leftMotor = None 
         self.rightMotor = None
@@ -100,14 +106,14 @@ class NXTurtle(Turtle):
         self._lazy = False
         self._autoRaisePen = True
         self._autoHome = False
-#        self._enableBrick = True
+
         self._brickHeading = 0
         self._brickCoords = Vec2D(0, 0)
         self._brickDown = False
 
         self._pen_handler = _default_pen_handler
         
-        self.config = self.DEFAULT_CONFIG
+        self.config = self.DEFAULT_CONFIG.copy()
         if connect:
             self.connect()
 
@@ -139,7 +145,7 @@ class NXTurtle(Turtle):
             print "%0.3f" % time.clock(), msg
         
     def connect(self):
-        """Connect NXTurtle with brick."""
+        """Connect NXTurtle with LEGO NXT brick."""
         self.debug("Connecting...")
         self.disconnect()
         self.brick = nxt.locator.find_one_brick()
@@ -151,11 +157,15 @@ class NXTurtle(Turtle):
             pprint(self.get_brick_info())
         
     def disconnect(self):
-        """"""
+        """Close connection and restore defined status.
+        
+        Should be called at the end of a program, because turtle's destructor
+        is not reliably called by Python. 
+        """
         if self.brick:
-            if self._autoRaisePen():
+            if self._autoRaisePen:
                 self.penup()
-            if self._autoHome():
+            if self._autoHome:
                 self.home()
             self.debug("Disconnecting...")
             self.leftMotor = self.rightMotor = self.penMotor = None
@@ -192,8 +202,6 @@ class NXTurtle(Turtle):
             raise NotImplementedError
         if not self.brick:
             return
-#        # Make sure we turn max +/- 360°
-#        degree = normAngle(degree)
         if math.fabs(degree) < _EPS_DEGREE:
             self.log("NXTurtle._turn(%f°) ignored" % degree)
             return True
@@ -202,7 +210,8 @@ class NXTurtle(Turtle):
 #        wheel_cirumference = _TURTLE_WHEEL_DIAMETER * math.pi 
 #        wheel_degree_per_full_turn = 360.0 * turning_circle_length / wheel_cirumference
 #        tacho_units = degree / 360.0 * wheel_degree_per_full_turn
-        tacho_units = degree * self.config["tachoPerDegree"] #_TURTLE_AXIS_LENGTH / _TURTLE_WHEEL_DIAMETER
+        tacho_units = degree * self.config["tachoPerDegree"]
+        
         # Use turn_ration=100; swap motors for left turns
         if tacho_units < 0:
             b, a = self.leftMotor, self.rightMotor 
@@ -219,7 +228,8 @@ class NXTurtle(Turtle):
         """Number of degrees that the wheel motors have to spin (in opposite
         direction), in order to turn Turtle by 1°.
         
-        This value may be calculated as AXIS_LENGTH / WHEEL_DIAMETER.
+        This value may be found by experimentation, or calculated as 
+            AXIS_LENGTH / WHEEL_DIAMETER.
         """
         self.config["tachoPerDegree"] = tacho_units
         return
@@ -228,7 +238,8 @@ class NXTurtle(Turtle):
         """Number of degrees that the wheel motors have to spin, in order to 
         move Turtle by 1 unit.
         
-        This value may be calculated as WHEEL_DIAMETER.
+        This value may be found by experimentation, or calculated as 
+            360.0 / (WHEEL_DIAMETER * math.pi)
         """
         self.config["tachoPerUnit"] = tacho_units
         return
@@ -309,7 +320,7 @@ class NXTurtle(Turtle):
         if not self.brick:
             return self._brickDown
         if self._brickDown == down:
-            self.debug("NXTurtle._set_pen(%s) -> ignored" % (down, str(self)))
+            self.debug("NXTurtle._set_pen(%s) -> ignored" % down)
             return self._brickDown
         self._pen_handler(self, down)
         self._brickDown = down
@@ -435,10 +446,32 @@ class NXTurtle(Turtle):
 # 
 #===============================================================================
 def test():
-#    turtle.fd(10)
+    
+    ### Create the turtle and connect to LEGO NXT brick
     connect = True
 #    connect = False
     t = NXTurtle(connect=connect)
+
+    ### Calibrate
+    AXIS_LENGTH = 12.5
+    WHEEL_DIAMETER = 4.4
+
+    tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER 
+    t.set_tacho_units_per_degree(tachoPerDegree)
+
+    tachoPerUnit = 360.0 / (WHEEL_DIAMETER * math.pi)
+    t.set_tacho_units_per_unit(tachoPerUnit)
+
+    def pen_handler(turtle, on):
+        power = 50
+        tacho_units = 60
+        if on:
+            power *= -1
+        turtle.penMotor.turn(power, tacho_units)
+
+    t.set_pen_handler(pen_handler)
+
+    ### Print some infos
 #    t._autoHome = True
     print "mode", t.screen.mode()
     print "heading", t.heading()
@@ -455,20 +488,15 @@ def test():
 #    t.left(90)
 #    t.fd(10)
 #    t.home()
-    def pen_handler(turtle, on):
-        power = 50
-        tacho_units = 60
-        if on:
-            power *= -1
-        turtle.penMotor.turn(power, tacho_units)
-
-    t.set_pen_handler(pen_handler)
     
+    ### Go an try it
+    t.play_tone(440, 500) 
     t.pendown()
-    t.fd(3)
+    t.fd(10)
     t.wait(1000)
     t.penup()
     t.home()
+    t.disconnect()
     return 
 
     t.play_tone_and_wait(440, 200)
