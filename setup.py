@@ -14,7 +14,7 @@ if not "HOME" in os.environ and  "HOMEPATH" in os.environ:
     os.environ.setdefault("HOME", os.environ.get("HOMEPATH", ""))
     print "Initializing HOME environment variable to '%s'" % os.environ["HOME"]
 
-setup(name="NXTurtle",
+setup(name="nxturtle",
       version = nxturtle.__version__,
       author = "Martin Wendt",
       author_email = "nxturtle@wwwendt.de",
