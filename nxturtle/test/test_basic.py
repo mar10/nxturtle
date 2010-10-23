@@ -4,7 +4,7 @@
 """Unit tests for wsgidav.util"""
 
 import unittest
-from nxturtle.nxturtle import NXTurtle
+from nxturtle import NXTurtle
 import math
 
 class BasicTest(unittest.TestCase):                          
@@ -20,15 +20,17 @@ class BasicTest(unittest.TestCase):
         AXIS_LENGTH = 12.5
         WHEEL_DIAMETER = 4.4
     
-        tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER 
-        t.set_tacho_units_per_degree(tachoPerDegree)
+        tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER
+        correction = 0.90 
+        t.set_tacho_units_per_degree(correction * tachoPerDegree)
     
         tachoPerUnit = 360.0 / (WHEEL_DIAMETER * math.pi)
-        t.set_tacho_units_per_unit(tachoPerUnit)
+        correction = 1.00 
+        t.set_tacho_units_per_unit(correction * tachoPerUnit)
     
         def pen_handler(turtle, on):
             power = 50
-            tacho_units = 60
+            tacho_units = 150
             if on:
                 power *= -1
             turtle.penMotor.turn(power, tacho_units)

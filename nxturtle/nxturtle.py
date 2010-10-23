@@ -2,11 +2,22 @@
 # (c) 2010 Martin Wendt; see http://nxturtle.googlecode.com/
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
-'''
-Created on 16.10.2010
+"""
+NXTurtle is a mashup of the Python implementations of Logo Turtle graphics 
+and a LEGO Mindstorms NXT driver.
 
+The interface is derived from the Python Turtle graphics for TK module 
+(http://docs.python.org/library/turtle.html).
+
+NTX-Python (http://code.google.com/p/nxt-python/) is used to control a 
+LEGO Mindstorms brick.
+
+See http://nxturtle.googlecode.com/ for details.
+
+
+Created on 16.10.2010
 @author: Wendt
-'''
+"""
 import math
 import time
 import nxt.locator
@@ -18,6 +29,8 @@ import sys
 import traceback
 from pprint import pprint
 from turtle import Turtle, Vec2D
+
+__version__ = "0.0.1"
 
 #===============================================================================
 # Helpers
@@ -502,11 +515,11 @@ def test():
     t.play_tone_and_wait(440, 200)
     
     b = t.brick
-    print 'Touch:', Touch(b, PORT_1).get_sample()
-    print 'Sound:', Sound(b, PORT_2).get_sample()
- #   print 'Light:', Light(b, PORT_3).get_sample()
-    print 'Light:', Color20(b, PORT_3).get_sample()
-#    print 'Ultrasonic:', Ultrasonic(b, PORT_4).get_sample()
+    print "Touch:", Touch(b, PORT_1).get_sample()
+    print "Sound:", Sound(b, PORT_2).get_sample()
+ #   print "Light:", Light(b, PORT_3).get_sample()
+    print "Light:", Color20(b, PORT_3).get_sample()
+#    print "Ultrasonic:", Ultrasonic(b, PORT_4).get_sample()
     
 #    for name, size in t.find_files("*.rso"):
 #        print "sound file", name.rstrip(chr(0)), size
