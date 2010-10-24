@@ -7,7 +7,7 @@ from nxturtle import NXTurtle
 import math
 
 ### Create the turtle and connect to LEGO NXT brick
-t = NXTurtle(connect=True)
+turtle = NXTurtle(connect=True)
 
 ### Calibrate
 # All turtles are not created equal, so we have to define how many motor turns
@@ -29,15 +29,15 @@ WHEEL_DIAMETER = 4.4
 # by one unit (i.e. one centimeter) 
 tachoPerUnit = 360.0 / (WHEEL_DIAMETER * math.pi)
 correction = 1.00 
-t.set_tacho_units_per_unit(correction * tachoPerUnit)
+turtle.set_tacho_units_per_unit(correction * tachoPerUnit)
 
 # It should also be possible to calculate the number of wheel turns it takes, 
 # to turn the turtle by one degree 
 tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER
-# ... observation shows that either Archimedes was wrong, or our turtle is not 
-# perfect. Anyway this correction factor will improve the results: 
+# ... observation shows that Archimedes was wrong, or our turtle is not 
+# perfect. Either way this correction factor will improve the results: 
 correction = 0.90 
-t.set_tacho_units_per_degree(correction * tachoPerDegree)
+turtle.set_tacho_units_per_degree(correction * tachoPerDegree)
 
 # This function is passed to our turtle. It will be called whenever the pen 
 # should be raised or put down. 
@@ -48,19 +48,24 @@ def pen_handler(turtle, on):
         power *= -1
     turtle.penMotor.turn(power, tacho_units)
 
-t.set_pen_handler(pen_handler)
+turtle.set_pen_handler(pen_handler)
 
 
 ### Go an try it
-t.pendown()
-t.forward(10)
-t.right(90)
-t.forward(10)
-t.penup()
-
-t.home()
-
-t.play_tone(440, 500) 
-
-### Close connection
-t.disconnect()
+# get set...
+turtle.pendown()
+# draw a square with 25 cm edge length
+turtle.fd(25)
+turtle.lt(90)
+turtle.fd(25)
+turtle.lt(90)
+turtle.fd(25)
+turtle.lt(90)
+turtle.fd(25)
+# walk to the center
+turtle.lt(135)
+turtle.fd(18)
+# wait for 5 seconds
+turtle.wait(5000)
+### Close connection (will also raise the pen)
+turtle.disconnect()

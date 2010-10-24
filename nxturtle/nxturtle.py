@@ -74,8 +74,11 @@ def lazyAngle(degree):
     """Return degree normalized to [-90..+90]."""
     a = shortAngle(degree)
     revert = False
-    if math.fabs(a) > 90:
-        a = a - 180
+    if a > 90:
+        a -= 180
+        revert = True
+    elif a < -90:
+        a += 180
         revert = True
     if math.fabs(a) < _EPS_DEGREE:
         a = 0
@@ -183,7 +186,12 @@ class NXTurtle(Turtle):
         self.brick = None
         
     def _drive(self, units):
-        """Run motors B, C to advance turtle by x units."""
+        """Run motors B and C to advance turtle by a number of units.
+        
+        A negative value will go backwards.
+        turtle.set_tacho_units_per_unit() should have been called before for
+        calibration.
+        """
         if not self.brick:
             return
         syncedMotor = SynchronizedMotors(self.leftMotor, self.rightMotor, 
@@ -202,9 +210,12 @@ class NXTurtle(Turtle):
         self.debug("NXTurtle._drive(%s) -> %s" % (units, str(self)))
         
     def _turn(self, degree, radius=0):
-        """Turn turtle right by degree clockwise.
+        """Turn turtle left (counterclockwise) by degree.
         
+        A negative degree value will turn right (clockwise).
         Run motors B and C to turn turtle by degree around it's z-axis.
+        turtle.set_tacho_units_per_degree() should have been called before for
+        calibration.
         """
         if radius != 0:
             raise NotImplementedError
@@ -214,10 +225,6 @@ class NXTurtle(Turtle):
             self.log("NXTurtle._turn(%f°) ignored" % degree)
             return True
 
-#        turning_circle_length = _TURTLE_AXIS_LENGTH * math.pi
-#        wheel_cirumference = _TURTLE_WHEEL_DIAMETER * math.pi 
-#        wheel_degree_per_full_turn = 360.0 * turning_circle_length / wheel_cirumference
-#        tacho_units = degree / 360.0 * wheel_degree_per_full_turn
         tacho_units = degree * self.config["tachoPerDegree"]
         
         # Use turn_ration=100; swap motors for left turns
@@ -238,6 +245,7 @@ class NXTurtle(Turtle):
         
         This value may be found by experimentation, or calculated as 
             AXIS_LENGTH / WHEEL_DIAMETER.
+        @see: http://code.google.com/p/nxturtle/wiki/ConstructAndCalibrate
         """
         self.config["tachoPerDegree"] = tacho_units
         return
@@ -248,21 +256,38 @@ class NXTurtle(Turtle):
         
         This value may be found by experimentation, or calculated as 
             360.0 / (WHEEL_DIAMETER * math.pi)
+        @see: http://code.google.com/p/nxturtle/wiki/ConstructAndCalibrate
         """
         self.config["tachoPerUnit"] = tacho_units
         return
     
     def set_lazy_mode(self, on):
-        """Go backwards, if this results in shorter turn angles."""
+        """Allow to go backwards, if this results in shorter turn angles.
+        
+        This only applies go goto(), home() or reset(). In this case our turtle
+        may choose to move backwards, so it has  only to turn max. 90°.
+        @return: the previous lazy mode
+        """
         prev = self._lazy
         self._lazy = on
         return prev
     
     def set_pen_handler(self, func):
+        """Define a callback function that raises or lowers the pen.
+        
+        The function must be defined like
+        
+            def pen_handler(turtle, down):
+                ...
+        
+        It may use `turtle.penMotor` to perform this. 
+        @see: http://code.google.com/p/nxturtle/wiki/ConstructAndCalibrate
+        """
         self._pen_handler = func
         return
     
     def get_brick_info(self):
+        """Return a dictionary with brich information."""
         try:
             b = self.brick
             name, host, signal_strength, user_flash = b.get_device_info()
@@ -285,11 +310,44 @@ class NXTurtle(Turtle):
                     "details": str(e)}
         
     def play_tone(self, frequency, duration, wait=True):
-        """Play tone for `duration` milli seconds."""
+        """Play a tone at frequency (Hz) for duration (ms)"""
         self.brick.play_tone(frequency, duration)
         if wait:
             time.sleep(duration / 1000.0)
 
+    def play_sound_file(self, fname, loop=False):
+        """Play a sound file. 
+        
+        If loop=True, it will be repeated until stop_sound_file() is called.
+        """
+        if not "." in fname:
+            fname += ".rso"
+        self.brick.play_sound_file(loop, fname)
+    
+    def stop_sound_file(self):
+        self.brick.stop_sound_playback()
+    
+#    def show_image_file(self, fname):
+#        raise NotImplementedError
+    
+    def start_program(self, fname):
+        self.brick.start_program(fname)
+    
+    def stop_program(self):
+        self.brick.stop_program()
+    
+    def set_name(self, name):
+        """Set brick name (truncated to 15 characters)."""
+        return self.brick.set_brick_name(name)
+    
+    def get_name(self):
+        """Return the brick name."""
+        return self.get_brick_info().get("NXT brick name")
+    
+#    def reboot(self):
+#        """Return the brick name."""
+#        return self.brick.boot()
+    
     def wait(self, duration):
         """Sleep for `duration` milliseconds."""
         time.sleep(duration / 1000.0)
@@ -355,7 +413,7 @@ class NXTurtle(Turtle):
         """Move turtle forward by specified distance."""
         # Called by forward, back
         # The default implementation calls _goto() which calls _drive()
-        # Set ince backward moves don't change heading, we force lazy mode
+        # Since backward moves don't change heading, we force lazy mode:
         prev = self.set_lazy_mode(distance < 0)
         super(NXTurtle, self)._go(distance)
         self.set_lazy_mode(prev)
@@ -383,6 +441,7 @@ class NXTurtle(Turtle):
         if abs(ofs) < _EPS_UNITS:
             return
         headingToDest = math.atan2(ofs[1], ofs[0]) * _RTOD
+#        headingToDest += 90  # because 0° is at east
         degree = headingToDest - self._brickHeading
         if self._lazy:
             # Turn max +/- 90° and go backwards, if that is faster
@@ -397,6 +456,7 @@ class NXTurtle(Turtle):
             degree = shortAngle(degree)
             self._turn(degree)
             self._drive(abs(ofs))
+        # Restore previous heading, so we stay in sync with base Turtle
         self._turn(-degree)
         self.debug("NXTurtle._goto(%s) -> %s" % (end, str(self)))
 
@@ -454,7 +514,7 @@ class NXTurtle(Turtle):
 # 
 #===============================================================================
 def test():
-    
+    pass
     ### Create the turtle and connect to LEGO NXT brick
     connect = True
 #    connect = False
@@ -485,25 +545,15 @@ def test():
     print "heading", t.heading()
     print "_orient", t._orient
     t.speed(1)
-#    print "\nfd(5)"
-#    t.fd(5)
-#    print "\nsetheading(90)"
-#    t.setheading(90)
-#    print "\nreset()"
-#    t.reset()
-
-#    t.fd(10)
-#    t.left(90)
-#    t.fd(10)
-#    t.home()
-    
-    ### Go an try it
-    t.play_tone(440, 500) 
-    t.pendown()
+    # --------------------------------------------------------------------------
+    t.verbose = 1
     t.fd(10)
-    t.wait(1000)
-    t.penup()
+    t.rt(90)
+    t.fd(10)
+    t.verbose = 2
+
     t.home()
+    # --------------------------------------------------------------------------
     t.disconnect()
     return 
 
