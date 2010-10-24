@@ -10,30 +10,37 @@ import math
 t = NXTurtle(connect=True)
 
 ### Calibrate
-# Our turtle design should match certain requirements: 
 # All turtles are not created equal, so we have to define how many motor turns
 # it takes to move it by one unit, or turn it by one degree.
-# Here we do this by a combination of calculation and observation ;-)
+# Here we do this by a combination of calculation and empirical information ;-)
 #
-# The left wheel is expected to be connected to motor B, the right wheel at
-# motor C:
+# We assume this preconditions:
+# - The left wheel is expected to be connected to motor B.
+# - The right wheel is at motor C.
+# - Motor A is used to control the pen.
+# -  
 
 # Distance between left and right wheel in [cm] (measured from middle of treads)
 AXIS_LENGTH = 12.5
 # Wheel diameter in [cm]
 WHEEL_DIAMETER = 4.4
 
-# Now we can calculate the number of wheel turns it takes, to 
-tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER
-correction = 0.90 
-t.set_tacho_units_per_degree(correction * tachoPerDegree)
-
+# Now we can calculate the number of wheel turns it takes, to move the turtle 
+# by one unit (i.e. one centimeter) 
 tachoPerUnit = 360.0 / (WHEEL_DIAMETER * math.pi)
 correction = 1.00 
 t.set_tacho_units_per_unit(correction * tachoPerUnit)
 
-# This function is passed to our turtle, whenever the pen should be raised or
-# put down. 
+# It should also be possible to calculate the number of wheel turns it takes, 
+# to turn the turtle by one degree 
+tachoPerDegree = AXIS_LENGTH / WHEEL_DIAMETER
+# ... observation shows that either Archimedes was wrong, or our turtle is not 
+# perfect. Anyway this correction factor will improve the results: 
+correction = 0.90 
+t.set_tacho_units_per_degree(correction * tachoPerDegree)
+
+# This function is passed to our turtle. It will be called whenever the pen 
+# should be raised or put down. 
 def pen_handler(turtle, on):
     power = 50
     tacho_units = 150

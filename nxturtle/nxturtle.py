@@ -3,20 +3,15 @@
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
 """
-NXTurtle is a mashup of the Python implementations of Logo Turtle graphics 
-and a LEGO Mindstorms NXT driver.
+Implementation of a Python turtle for LEGO Mindstorms NXT
 
-The interface is derived from the Python Turtle graphics for TK module 
-(http://docs.python.org/library/turtle.html).
-
-NTX-Python (http://code.google.com/p/nxt-python/) is used to control a 
-LEGO Mindstorms brick.
+NXTurtle is a mashup of the Python `Turtle graphics for TK` module 
+(http://docs.python.org/library/turtle.html) and the LEGO Mindstorms driver 
+NXT-Python (http://nxt-python.googlecode.com/). 
 
 See http://nxturtle.googlecode.com/ for details.
 
-
-Created on 16.10.2010
-@author: Wendt
+@author: Martin Wendt
 """
 import math
 import time

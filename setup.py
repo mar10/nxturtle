@@ -21,7 +21,7 @@ setup(name="nxturtle",
       maintainer = "Martin Wendt",
       maintainer_email = "nxturtle@wwwendt.de",
       url = "http://nxturtle.googlecode.com/",
-      description = "Logo turtle graphics on LEGO Miondstorms",
+      description = "Implementation of a Python turtle for LEGO Mindstorms NXT",
       long_description = nxturtle.__doc__,
 
         #Development Status :: 2 - Pre-Alpha
