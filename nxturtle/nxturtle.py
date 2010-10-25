@@ -25,7 +25,7 @@ import traceback
 from pprint import pprint
 from turtle import Turtle, Vec2D
 
-__version__ = "0.0.1"
+__version__ = "1.0.3"
 
 #===============================================================================
 # Helpers
@@ -71,15 +71,19 @@ def shortAngle(degree):
     return a
 
 def lazyAngle(degree):
-    """Return degree normalized to [-90..+90]."""
+    """Return a tuple (degree normalized to [-90..+90], direction factor).
+    
+    Example: if degree is 100°, the result will (-80°, -1), becaus it is faster
+    to turn right by 10° and then drive backwards.
+    """
     a = shortAngle(degree)
-    revert = False
+    revert = 1
     if a > 90:
         a -= 180
-        revert = True
+        revert = -1
     elif a < -90:
         a += 180
-        revert = True
+        revert = -1
     if math.fabs(a) < _EPS_DEGREE:
         a = 0
     return (a, revert)
@@ -402,12 +406,16 @@ class NXTurtle(Turtle):
         
     def home(self):
         """Reset turtle to its initial values."""
-        try:
-            prev = self.set_lazy_mode(True)
-#            self.penup()
-            super(NXTurtle, self).home()
-        finally:
-            self.set_lazy_mode(prev)
+        ofs =  - self._brickCoords
+        headingToDest = math.atan2(ofs[1], ofs[0]) * _RTOD
+        alpha = headingToDest - self._brickHeading
+        # Turn max +/- 90° and go backwards, if that is faster
+        alpha, revert = lazyAngle(alpha)
+        self._turn(alpha)
+        self._drive(revert * abs(ofs))
+        # Turn to 0°
+        self._turn(shortAngle(-self._brickHeading))
+        self.debug("NXTurtle.home() -> %s" % str(self))
 
     def _go(self, distance):
         """Move turtle forward by specified distance."""
@@ -423,7 +431,6 @@ class NXTurtle(Turtle):
         super(NXTurtle, self)._rotate(angle)
         self._turn(angle)
 
-#    def _goto_ext(self, end, ):
     def _goto(self, end):
         """Move turtle to position end.
         
@@ -441,23 +448,19 @@ class NXTurtle(Turtle):
         if abs(ofs) < _EPS_UNITS:
             return
         headingToDest = math.atan2(ofs[1], ofs[0]) * _RTOD
-#        headingToDest += 90  # because 0° is at east
-        degree = headingToDest - self._brickHeading
+        alpha = headingToDest - self._brickHeading
         if self._lazy:
             # Turn max +/- 90° and go backwards, if that is faster
-            degree, revert = lazyAngle(degree)
-            self._turn(degree)
-            if revert:
-                self._drive(-abs(ofs))
-            else:
-                self._drive(abs(ofs))
+            alpha, revert = lazyAngle(alpha)
+            self._turn(alpha)
+            self._drive(revert * abs(ofs))
         else:
             # Turn +/- 180°, always go forward
-            degree = shortAngle(degree)
-            self._turn(degree)
+            alpha = shortAngle(alpha)
+            self._turn(alpha)
             self._drive(abs(ofs))
         # Restore previous heading, so we stay in sync with base Turtle
-        self._turn(-degree)
+        self._turn(-alpha)
         self.debug("NXTurtle._goto(%s) -> %s" % (end, str(self)))
 
     def circle(self, radius, extent = None, steps = None):
@@ -547,6 +550,8 @@ def test():
     t.speed(1)
     # --------------------------------------------------------------------------
     t.verbose = 1
+    t.fd(10)
+    t.rt(90)
     t.fd(10)
     t.rt(90)
     t.fd(10)

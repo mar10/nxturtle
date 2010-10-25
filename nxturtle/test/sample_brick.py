@@ -8,6 +8,8 @@ These are functions that a simple Logo turtle can't do.
 
 from nxturtle import NXTurtle
 import math
+from nxt.sensor import Ultrasonic
+from nxt.sensor.common import PORT_4
 
 ### Create the turtle and connect to LEGO NXT brick
 turtle = NXTurtle(connect=True)
@@ -35,6 +37,11 @@ def pen_handler(turtle, on):
 
 turtle.set_pen_handler(pen_handler)
 
+# Attach sensor
+turtle.eyes = Ultrasonic(turtle.brick, PORT_4)
+
+# Read  sensor data
+print "I can see for %s miles..." % turtle.eyes.get_distance()
 
 ### Access name and other info
 
