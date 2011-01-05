@@ -16,16 +16,15 @@ See http://nxturtle.googlecode.com/ for details.
 import math
 import time
 import nxt.locator
-from nxt.sensor import PORT_1, PORT_2, PORT_3, PORT_4
-from nxt.sensor import Touch, Sound, Light, Ultrasonic, Color20
+#from nxt.sensor import PORT_1, PORT_2, PORT_3
+#from nxt.sensor import Touch, Sound, Light, Ultrasonic, Color20
 from nxt.brick import FileFinder, ModuleFinder, FileReader
 from nxt.motor import Motor, PORT_A, PORT_B, PORT_C, SynchronizedMotors
 import sys
 import traceback
 from pprint import pprint
 from turtle import Turtle, Vec2D
-
-__version__ = "1.0.3"
+from version import __version__
 
 #===============================================================================
 # Helpers
@@ -519,6 +518,7 @@ class NXTurtle(Turtle):
 def test():
     pass
     ### Create the turtle and connect to LEGO NXT brick
+    print "NXTurtle %s" % __version__
     connect = True
 #    connect = False
     t = NXTurtle(connect=connect)
@@ -564,11 +564,11 @@ def test():
 
     t.play_tone_and_wait(440, 200)
     
-    b = t.brick
-    print "Touch:", Touch(b, PORT_1).get_sample()
-    print "Sound:", Sound(b, PORT_2).get_sample()
- #   print "Light:", Light(b, PORT_3).get_sample()
-    print "Light:", Color20(b, PORT_3).get_sample()
+#    b = t.brick
+#    print "Touch:", Touch(b, PORT_1).get_sample()
+#    print "Sound:", Sound(b, PORT_2).get_sample()
+#    print "Light:", Light(b, PORT_3).get_sample()
+#    print "Light:", Color20(b, PORT_3).get_sample()
 #    print "Ultrasonic:", Ultrasonic(b, PORT_4).get_sample()
     
 #    for name, size in t.find_files("*.rso"):
