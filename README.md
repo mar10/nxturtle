@@ -30,7 +30,7 @@ Any feedback is welcome :-)
   1. This project builds on Python and the NXT-Python driver.<br>
      Read the [installation instructions](https://github.com/mar10/nxturtle/wiki/Installation) for details.
   2. Build your LEGO Mindstorms turtle. 
-     The robot should meet some requirements: 
+     The robot should meet some requirements:<br>
      Read the [build instructions](https://github.com/mar10/nxturtle/wiki/ConstructAndCalibrate) for details.
   3. Calibrate your turtle (also described in the build instructions).
   4. Read the [Tutorial](https://github.com/mar10/nxturtle/wiki/Tutorial).
