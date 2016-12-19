@@ -25,14 +25,15 @@ Having said that: Have fun!
 Any feedback is welcome :-)
 
 
-### Requirements and installation
+### Get Started
 
-  1. This project builds on Python and [NXT-Python](https://github.com/eelviny/nxt-python).<br>
-     Read the [[installation instructions|Installation]] for details.
+  1. This project builds on Python and the NXT-Python driver.<br>
+     Read the [installation instructions](https://github.com/mar10/nxturtle/wiki/Installation) for details.
   2. Build your LEGO Mindstorms turtle. 
-     The robot should meet some requirements.<br>
-     Read the [[build instructions|ConstructAndCalibrate]] for details.
+     The robot should meet some requirements: 
+     Read the [build instructions](https://github.com/mar10/nxturtle/wiki/ConstructAndCalibrate) for details.
   3. Calibrate your turtle (also described in the build instructions).
+  4. Read the [Tutorial](https://github.com/mar10/nxturtle/wiki/Tutorial).
 
 After this, you are ready to use it:
 
@@ -55,7 +56,7 @@ yertle.home()
 yertle.play_tone(440, 500)
 ```
 
-Read the [[Tutorial]] for more...
+Read the [Tutorial](https://github.com/mar10/nxturtle/wiki/Tutorial) for more...
 
 
 [![Demo Video](https://img.youtube.com/vi/5xIK6iFTDzM/0.jpg)](http://www.youtube.com/watch?v=5xIK6iFTDzM)
