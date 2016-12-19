@@ -1,4 +1,0 @@
-glob:build/
-glob:NXTurtle.egg-info/
-glob:*.pyc
-glob:dist/

@@ -19,9 +19,9 @@ Implementation of a Python turtle for LEGO Mindstorms NXT
 
 NXTurtle is a mashup of the Python `Turtle graphics for TK` module 
 (http://docs.python.org/library/turtle.html) and the LEGO Mindstorms driver 
-NXT-Python (http://nxt-python.googlecode.com/). 
+NXT-Python (https://github.com/eelviny/nxt-python). 
 
-See http://nxturtle.googlecode.com/ for details.
+See https://github.com/mar10/nxturtle for details.
 """.strip()
 
 # 'setup.py upload' fails on Vista, because .pypirc is searched on 'HOME' path
@@ -36,7 +36,7 @@ try:
           author_email = "nxturtle@wwwendt.de",
           maintainer = "Martin Wendt",
           maintainer_email = "nxturtle@wwwendt.de",
-          url = "http://nxturtle.googlecode.com/",
+          url = "https://github.com/mar10/nxturtle",
           description = "Implementation of a Python turtle for LEGO Mindstorms NXT",
           long_description = long_description,
     

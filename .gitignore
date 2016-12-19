@@ -1,0 +1,4 @@
+build/
+NXTurtle.egg-info/
+*.pyc
+dist/

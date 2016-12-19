@@ -1,12 +1,14 @@
+# NXTurtle [![Powered by You](http://sapegin.github.io/powered-by-you/badge.svg)](http://sapegin.github.io/powered-by-you/)
 
 >NXTurtle is a mashup of the [Python Turtle graphics for TK](http://docs.python.org/library/turtle.html) 
-module and the LEGO Mindstorms driver [NXT-Python](http://code.google.com/p/nxt-python/).<br>
+module and the LEGO Mindstorms driver [NXT-Python](https://github.com/eelviny/nxt-python).<br>
 >It allows you to control a LEGO Mindstorms robot like the [turtle](http://en.wikipedia.org/wiki/Turtle_(robot)) 
 known from the [Logo programming language](http://en.wikipedia.org/wiki/Logo_(programming_language)).
 
 
 ### Status
-This is a hollyday project and barely tested.
+
+This is a holiday project and barely tested.
 
 Just to remind you
 ```
@@ -23,10 +25,13 @@ Having said that: Have fun!
 Any feedback is welcome :-)
 
 
-### Requirements  and installation
+### Requirements and installation
 
-  1. This project builds on Python and [http://code.google.com/p/nxt-python/ NXT-Python].<br>Read the [Installation installation instructions] for details.
-  2. Build your LEGO Mindstorms turtle. The robot should meet some requirements.<br>Read the [ConstructAndCalibrate build instructions] for details.
+  1. This project builds on Python and [NXT-Python](https://github.com/eelviny/nxt-python).<br>
+     Read the [[installation instructions|Installation]] for details.
+  2. Build your LEGO Mindstorms turtle. 
+     The robot should meet some requirements.<br>
+     Read the [[build instructions|ConstructAndCalibrate]] for details.
   3. Calibrate your turtle (also described in the build instructions).
 
 After this, you are ready to use it:
@@ -34,7 +39,7 @@ After this, you are ready to use it:
 
 ### Example
 
-```python
+```py
 from nxturtle import NXTurtle
 yertle = NXTurtle(connect=True)
 
@@ -50,6 +55,7 @@ yertle.home()
 yertle.play_tone(440, 500)
 ```
 
-Read the [Tutorial tutorial] for more...
-<hr>
-<wiki:video url="http://www.youtube.com/watch?v=5xIK6iFTDzM"/>
+Read the [[Tutorial]] for more...
+
+
+[![Demo Video](https://img.youtube.com/vi/5xIK6iFTDzM/0.jpg)](http://www.youtube.com/watch?v=5xIK6iFTDzM)
